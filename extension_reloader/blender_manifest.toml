@@ -1,0 +1,10 @@
+schema_version = "1.0.0"
+id = "extension_reloader"
+version = "1.0.0"
+name = "Extension Reloader"
+tagline = "Reloads addons & extensions without restarting Blender"
+maintainer = "n4dirp"
+type = "add-on"
+tags = ["Development", "System"]
+blender_version_min = "4.2.0"
+license = ["SPDX:GPL-3.0-or-later"]
