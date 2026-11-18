@@ -196,6 +196,39 @@ def auto_refresh_list_on_load(dummy):
     refresh_list(bpy.context)
 
 
+def _initial_refresh_timer():
+    """Populate the list once ``register()`` has returned.
+
+    ``addon_utils.enable()`` runs ``register()`` with a restricted
+    ``bpy.context``, so defer the first scan until the event loop restores the
+    real context. Returning ``None`` makes this a one-shot timer.
+    """
+    context = bpy.context
+    refresh_list(context)
+
+    window_manager = getattr(context, "window_manager", None)
+    if window_manager is not None:
+        for window in window_manager.windows:
+            for area in window.screen.areas:
+                area.tag_redraw()
+
+    return None
+
+
+def schedule_initial_refresh():
+    """Queue the first list population right after the add-on is enabled."""
+    bpy.app.timers.register(_initial_refresh_timer, first_interval=0.0)
+
+
+def cancel_initial_refresh():
+    """Cancel a queued initial refresh when the add-on is disabled/reloaded."""
+    try:
+        bpy.app.timers.unregister(_initial_refresh_timer)
+    except ValueError:
+        # Already fired, or never scheduled.
+        pass
+
+
 def select_addon_in_list(context, addon_name):
     """Select ``addon_name`` in the sidebar list, if it is present."""
     window_manager = getattr(context, "window_manager", None)

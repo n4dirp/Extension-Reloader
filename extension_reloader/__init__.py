@@ -32,7 +32,9 @@ from .properties import (
 )
 from .scan import (
     auto_refresh_list_on_load,
+    cancel_initial_refresh,
     refresh_list,
+    schedule_initial_refresh,
     select_addon_in_list,
 )
 from .ui_list import ERL_UL_AddonList
@@ -40,7 +42,7 @@ from .ui_list import ERL_UL_AddonList
 # The self-reload timer (reload.py) looks these up dynamically on the reloaded
 # top-level module. Listing them in __all__ keeps them from being removed as
 # "unused" and silently breaking the post-reload UI refresh.
-__all__ = ("refresh_list", "select_addon_in_list")
+__all__ = ("cancel_initial_refresh", "refresh_list", "select_addon_in_list")
 
 classes = (
     ERL_AddonListItem,
@@ -65,11 +67,17 @@ def register():
 
     bpy.types.WindowManager.erl_reload_props = bpy.props.PointerProperty(type=ERL_ReloadProperties)
 
-    # Safely load the list *after* Blender sets up context.
+    # Populate immediately, but defer until register() has returned so the
+    # restricted addon-loading context is gone.
+    schedule_initial_refresh()
+
+    # Repopulate after a file load, since the WindowManager is replaced.
     bpy.app.handlers.load_post.append(auto_refresh_list_on_load)
 
 
 def unregister():
+    cancel_initial_refresh()
+
     if auto_refresh_list_on_load in bpy.app.handlers.load_post:
         bpy.app.handlers.load_post.remove(auto_refresh_list_on_load)
 

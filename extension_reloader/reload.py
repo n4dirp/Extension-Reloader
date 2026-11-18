@@ -145,6 +145,15 @@ def schedule_self_reload(addon_name):
                     except Exception:
                         _traceback.print_exc()
 
+                # register() queues an initial refresh; the one above already
+                # did the job, so cancel the pending duplicate.
+                cancel_func = getattr(reloaded_module, "cancel_initial_refresh", None)
+                if cancel_func is not None:
+                    try:
+                        cancel_func()
+                    except Exception:
+                        _traceback.print_exc()
+
                 for window in window_manager.windows:
                     for area in window.screen.areas:
                         area.tag_redraw()

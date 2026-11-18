@@ -60,8 +60,3 @@ class ERL_AddonPreferences(AddonPreferences):
         default=True,
         update=_on_filter_prefs_update,
     )
-
-    def draw(self, context):
-        layout = self.layout
-
-        layout.prop(self, "show_addons_enabled_only")
