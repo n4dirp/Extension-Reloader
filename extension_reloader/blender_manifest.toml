@@ -1,6 +1,6 @@
 schema_version = "1.0.0"
 id = "extension_reloader"
-version = "1.0.0"
+version = "1.0.1"
 name = "Extension Reloader"
 tagline = "Reloads addons & extensions without restarting Blender"
 maintainer = "n4dirp"
